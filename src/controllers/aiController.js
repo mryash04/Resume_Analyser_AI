@@ -3,39 +3,33 @@ const { analyzeSchema } = require("../validators/analyzeValidator");
 const logger = require("../utils/logger");
 
 async function analyzeText(req, res, next) {
-
-try {
-
+  try {
     logger.info("AI analyze request received");
-    
-const parsed = analyzeSchema.parse(req.body);
 
-const { text } = req.body;
+    const parsed = analyzeSchema.parse(req.body);
 
-if (!text) {
-return res.status(400).json({
-error: "Text is required"
-});
-}
+    const { text } = req.body;
 
-const result = await analyzeTextService(parsed.text);
+    if (!text) {
+      return res.status(400).json({
+        error: "Text is required",
+      });
+    }
 
-logger.info("AI analysis successful");
+    const result = await analyzeTextService(parsed.text);
 
-res.json(result);
+    logger.info("AI analysis successful");
 
-} catch (error) {
-
+    res.json(result);
+  } catch (error) {
     logger.error("AI analysis failed", { error: error.message });
 
-    next(error)
+    next(error);
 
     console.log("error", error);
 
-res.status(500).json({ error: "AI processing failed" });
-
-}
-
+    res.status(500).json({ error: "AI processing failed" });
+  }
 }
 
 module.exports = { analyzeText };
