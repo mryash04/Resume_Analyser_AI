@@ -67,7 +67,7 @@
 const { GoogleGenAI } = require("@google/genai");
 
 const ai = new GoogleGenAI({
-apiKey: "AIzaSyD5cdaUuJQ7E37gEtWctnlKLZJDFRlGPdo"
+apiKey: process.env.GEMINI_API_KEY
 });
 
 function cleanJSON(text) {
