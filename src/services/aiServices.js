@@ -1,39 +1,30 @@
 const ai = require("../config/gemini");
-const {cleanJSON} = require("../utils/jsonParser")
+const { buildAnalyzePrompt } = require("../prompts/analyzePrompt");
+const { cleanJSON } = require("../utils/jsonParser");
+const logger = require("../utils/logger");
+const tools = require("../tools/wordCount")
 
 async function analyzeTextService(text) {
+  if (text.startsWith("count words")) {
+    const input = text.replace("count words", "").trim();
 
-const prompt = `
-Analyze this text.
+    logger.info("Executing tool: wordCount");
 
-Return JSON:
-{
-"title":"",
-"summary":"",
-"keywords":[]
-}
+    return tools.wordCount(input);
+  }
 
-TEXT:
-${text}
-`;
+  const prompt = buildAnalyzePrompt(text);
 
-const response = await ai.models.generateContent({
-  model: "gemini-2.5-flash",
-  contents: prompt
-});
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+  });
 
-const cleaned = cleanJSON(response.text);
+  logger.info("Gemini response received");
 
-const parsed = JSON.parse(cleaned);
+  const cleaned = cleanJSON(response.text);
 
-return parsed;
-
-// const newText = response.text.replace(/```json/g, "").replace(/```/g, "").trim();
-
-// // return cleanJSON(response.text);
-
-// return newText
-
+  return JSON.parse(cleaned);
 }
 
 module.exports = { analyzeTextService };
